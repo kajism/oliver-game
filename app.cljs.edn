@@ -1,0 +1,4 @@
+^{:watch-dirs ["src/cljs" "src/cljc"]
+  :open-url false
+  :ring-server-options {:port 9502}}
+{:main oliver-game.core}

@@ -1,0 +1,9 @@
+/*.log
+/target
+/log
+/config
+/*-init.clj
+/resources/public/cljs-out/
+out
+/.*
+!.gitignore

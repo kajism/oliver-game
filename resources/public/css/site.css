@@ -1,0 +1,22 @@
+.ui.form .fields {
+    margin-bottom: 0.6em;
+}
+
+.ui.form input:not([type]),
+.ui.segment input {
+    padding: 0.3em;
+}
+
+.ui.button,
+.ui.labeled.input>.label:not(.corner),
+.ui.action.input>.button {
+    padding: 0.5em 0.65em;
+}
+
+.ui.switch.button {
+    background-color: LightBlue;
+}
+
+.ui.compact.table th {
+    padding: .3em
+}

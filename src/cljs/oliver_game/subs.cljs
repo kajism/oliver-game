@@ -9,3 +9,8 @@
  ::active-panel
  (fn [db _]
    (:active-panel db)))
+
+(re-frame/reg-sub
+ ::show?
+ (fn [db [_ kw]]
+   (get db kw)))

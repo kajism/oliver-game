@@ -26,6 +26,12 @@
  (fn [db [_ active-panel]]
    (assoc db :active-panel active-panel)))
 
+
+(re-frame/reg-event-db
+ ::toggle
+ (fn [db [_ kw]]
+   (update db kw not)))
+
 (re-frame/reg-event-fx
  ::ws-error?
  (fn [{:keys [db]} [_ state]]

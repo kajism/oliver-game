@@ -4,10 +4,12 @@
    [oliver-game.common :as common]
    [oliver-game.events :as events]
    [oliver-game.subs :as subs]
+   [reagent.core :as reagent]
    [re-frame.core :as re-frame]))
 
 (defn panel []
-  (let [show-milk-shakes? (re-frame/subscribe [::subs/show? :show-milk-shakes?])]
+  (let [show-milk-shakes? (re-frame/subscribe [::subs/show? :show-milk-shakes?])
+        counter (reagent/atom 24)]
     (fn []
       [:div
        [:h3 "Oliver's Game Page"]
@@ -36,7 +38,14 @@
                  :style {:cursor "pointer"}
                  :on-click #(re-frame/dispatch [::events/toggle :show-milk-shakes?])
                  :opacity (if @show-milk-shakes? "1.0" "0.2")}]
-        [:g {:transform "translate(1080, 0)" :on-click #(re-frame/dispatch [::events/hide-all])}
+        [:g {:transform "translate(1080, 2)" :on-click #(re-frame/dispatch [::events/hide-all])}
          [:rect {:width 200 :height 50 :stroke "black" :fill "pink"}]
          [:text {:x 10 :y 35 :fill "black" :style {:font-size "200%" :cursor "pointer"}} "ODMÍTNOUT"]]
+        [:g {:transform "translate(20, 335)" :on-click #(re-frame/dispatch [::events/hide-all])}
+         [:rect {:width 60 :height 35 :stroke "white" :fill "white" :fill-opacity "0.5"}]
+         [:text {:x 0 :y 27 :fill "DarkGreen"
+                 :style {:font-size "180%" :font-weight "bold" :cursor "pointer" :user-select "none"}
+                 :on-click #(swap! counter inc)}
+          "$" @counter]]
+        
         ]])))

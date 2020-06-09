@@ -32,6 +32,16 @@
  (fn [db [_ kw]]
    (update db kw not)))
 
+(re-frame/reg-event-db
+ ::hide-all
+ (fn [db [_ kw]]
+   (assoc db
+          :show-hamburgers? false
+          :show-new-trades? false
+          :show-milk-shakes? false
+          :show-hot-dogs? false
+          :show-ice-creams? false)))
+
 (re-frame/reg-event-fx
  ::ws-error?
  (fn [{:keys [db]} [_ state]]

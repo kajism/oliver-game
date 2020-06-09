@@ -17,7 +17,7 @@
         [cljs.tools.reader.edn :as edn]
         [clojure.string :as str])]))
 
-(def html-title "Oliver Game")
+(def html-title "Oliver's Game")
 
 (defn parse-int [s]
   (when-not (str/blank? s)

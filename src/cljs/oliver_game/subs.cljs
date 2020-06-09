@@ -14,3 +14,8 @@
  ::show?
  (fn [db [_ kw]]
    (get db kw)))
+
+(re-frame/reg-sub
+ ::chat
+ (fn [db [_]]
+   (:chat db)))

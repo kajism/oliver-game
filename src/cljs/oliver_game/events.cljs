@@ -32,6 +32,12 @@
  (fn [db [_ kw]]
    (update db kw not)))
 
+(re-frame/reg-event-fx
+ ::send
+ (fn [_ [_ msg]]
+   {:ws-call {:type :chat
+              :msg msg}}))
+
 (re-frame/reg-event-db
  ::hide-all
  (fn [db [_ kw]]
@@ -56,6 +62,7 @@
          (case type
            :init-info [[:init-info] (:result msg)]
            :app-domains [[:app-domains] (:result msg)]
+           :chat [[:chat] #(str % "\n" (:msg msg))]
            nil)]
      (cond-> {:db (cond-> (assoc db :ws-error? false)
                     (fn? value)

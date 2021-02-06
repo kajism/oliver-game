@@ -48,6 +48,34 @@
           :show-hot-dogs? false
           :show-ice-creams? false)))
 
+(re-frame/reg-event-db
+ ::set-in
+ (fn [db [_ path v]]
+   (let [path (if (vector? path) path [path])]
+     (assoc-in db path v))))
+
+(def users {"Olda" {:pwd "Ferdafrog"
+                    :title "Owner"
+                    :color "green"}
+            "kajism" {:pwd "ahoj"
+                      :title "Programátor"
+                      :color "green"}
+            "DobryVecer" {:pwd "testujem"
+                          :title "Tester"
+                          :color "yellow"}})
+
+(re-frame/reg-event-db
+ ::login
+ (fn [db [_]]
+   (let [nickname (get-in db [:login :nickname])]
+     (if (= (get-in db [:login :pwd]) (get-in users [nickname :pwd]))
+       (assoc db :user nickname
+              :login nil)
+       (-> db
+           (assoc :login {:error "Neplatné uživatelské jméno nebo heslo"
+                          :nickname ""
+                          :pwd ""}))))))
+
 (re-frame/reg-event-fx
  ::ws-error?
  (fn [{:keys [db]} [_ state]]

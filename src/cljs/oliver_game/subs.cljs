@@ -19,3 +19,9 @@
  ::chat
  (fn [db [_]]
    (:chat db)))
+
+(re-frame/reg-sub
+ ::get-in
+ (fn [db [_ path]]
+   (let [path (if (vector? path) path [path])]
+     (get-in db path))))

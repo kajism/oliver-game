@@ -55,6 +55,11 @@
 (defmulti exec! (fn [track msg]
                   (:type msg)))
 
+(def db-filename "./db.txt")
+
+(defmethod exec! :chat [_ msg]
+  (spit db-filename (str (:msg msg) "\n") :append true))
+
 (defmethod exec! :default [track msg]
   (log/error "Unknown exec msg type!" msg))
 
@@ -87,7 +92,10 @@
                  :result (env :app-domains)})
   (ws-put! conn {:type :init-info
                  :result {:version-info (app-version-info)
-                          :user user}}))
+                          :user user}})
+  (doseq [line #p(str/split (slurp db-filename) #"\n")]
+    (ws-put! conn #p{:type :chat
+                   :msg line})))
 
 (defn ws-msg-consumer [{:keys [remote-addr session] :as req} conn msg]
   (let [{:keys [trckn type trn] :as msg} (from-transit msg)] ;;edn: (edn/read-string msg)

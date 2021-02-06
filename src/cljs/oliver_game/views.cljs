@@ -47,14 +47,19 @@
        (when @show-inventory?
          [inventory])])))
 
+(defn show-user [u]
+  [:span [:span {:style {:color (get-in events/users [u :color])}} (get-in events/users [u :title])]
+   " " u])
+
 (defn panel []
   (let [show-milk-shakes? (re-frame/subscribe [::subs/show? :show-milk-shakes?])
         celkem (reagent/atom 0)
         ;;pokladna (reagent/atom (int (rand 84)))
         burger-idx (reagent/atom (int (rand 3)))
         show-game? (reagent/atom false)
-        mini-adventures? (reagent/atom true)
-        chat-input (reagent/atom "")]
+        mini-adventures? (reagent/atom false)
+        chat-input (reagent/atom "")
+        user (re-frame/subscribe [::subs/get-in :user])]
     (fn []
       [:div
        [:h1 "Oliver's Game Page"]
@@ -122,13 +127,51 @@
          :default
          [:div
           [:h3 "Vážení návštěvníci, rád bych vám sdělil, že moje hra sice není úplně dokončená, ale můžete si vyskoušet tuto hru a postupně ji budeme vylepšovat."]
+          (if-not @user
+            [:div
+             (let [nickname @(re-frame/subscribe [::subs/get-in [:login :nickname]])
+                   pwd @(re-frame/subscribe [::subs/get-in [:login :pwd]])]
+               [:div
+                [:h4 "VIP Přihlášení"]
+                [:div"Přezdívka: "
+                 [:input {:type "text" :on-change #(re-frame/dispatch [::events/set-in [:login :nickname] (etv %)])
+                          :value nickname
+                          :style {:width "200px"}} ]]
+                [:div"Heslo: "
+                 [:input {:type "password" :on-change #(re-frame/dispatch [::events/set-in [:login :pwd] (etv %)])
+                          :value pwd
+                          :style {:width "200px"}} ]]
+                (when-let [err-msg @(re-frame/subscribe [::subs/get-in [:login :error]])]
+                  [:div {:style {:color "red"}} err-msg])
+                [:button {:on-click #(re-frame/dispatch [::events/login])} "Přihlásit se"]])
+             [:br]
+             (let [nickname @(re-frame/subscribe [::subs/get-in :nickname])]
+               [:div
+                [:h4 "Přihlášení pod jménem"]
+                [:div"Přezdívka: "
+                 [:input {:type "text" :on-change #(re-frame/dispatch [::events/set-in :nickname (etv %)])
+                          :value nickname
+                          :style {:width "200px"}} ]]
+                [:button {:on-click #(re-frame/dispatch [::events/set-in :user nickname])} "Zaregistrovat"]])]
+            [:h1 [show-user @user]
+             [:button {:on-click #(re-frame/dispatch [::events/set-in :user nil])} "Odhlásit se"]])
           [:h3 "Chat"]
-          [:pre @(re-frame/subscribe [::subs/chat])]
-          [:input {:type "text" :on-change #(reset! chat-input (etv %)) :value @chat-input
-                   :style {:width "600px"}} ]
-          [:button {:on-click #(do
-                                 (re-frame/dispatch [::events/send @chat-input])
-                                 (reset! chat-input ""))} "Odeslat"]
+          (let [chat @(re-frame/subscribe [::subs/chat])
+                lines (str/split chat #"\n")]
+            (doall
+             (for [line lines
+                   :let [[u text] (str/split line #":")]
+                   :when (not (str/blank? text))]
+               [:div [show-user u] ": " text]))
+            )
+          (when @user
+            [:div
+             @user ": "
+             [:input {:type "text" :on-change #(reset! chat-input (etv %)) :value @chat-input
+                      :style {:width "600px"}} ]
+             [:button {:on-click #(do
+                                    (re-frame/dispatch [::events/send (str @user ": " @chat-input)])
+                                    (reset! chat-input ""))} "Odeslat"]])
           [:br]
           [:br]
           [:button {:on-click #(reset! show-game? true)} "Hrát hru"][:br][:br]

@@ -1,4 +1,4 @@
-(defproject oliver-game "0.0.4-SNAPSHOT"
+(defproject oliver-game "0.0.4"
   :dependencies [[org.clojure/clojure "1.11.1"]
                  [org.clojure/clojurescript  "1.11.4"]
                  [org.clojure/tools.logging "1.2.4"]

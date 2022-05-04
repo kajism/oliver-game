@@ -1,31 +1,24 @@
 (ns oliver-game.events
-  (:require [clojure.edn :as edn]
-            [clojure.string :as str]
-            [re-frame.core :as re-frame]
-            [re-pressed.core :as rp]
-            [oliver-game.common :as common]
-            [oliver-game.db :as db]
-            [oliver-game.websocket :as websocket]))
+  (:require [re-frame.core :as re-frame]
+            [oliver-game.db :as db]))
 
 (re-frame/reg-event-fx
  ::initialize
  (fn [_ _]
    (let [trckn (:trckn db/default-db)]
      {:db db/default-db
-      :ws-call {:type :get-init-info}
-      :dispatch [::select-track trckn]})))
+      :ws-call {:type :ws-client/get-init-info}})))
 
 (re-frame/reg-event-fx
  ::check-init-info
  (fn [{:keys [db]} _]
    (when-not (:init-info db)
-     {:ws-call {:type :get-init-info}})))
+     {:ws-call {:type :ws-client/get-init-info}})))
 
 (re-frame/reg-event-db
  ::set-active-panel
  (fn [db [_ active-panel]]
    (assoc db :active-panel active-panel)))
-
 
 (re-frame/reg-event-db
  ::toggle
@@ -62,7 +55,16 @@
                       :color "green"}
             "DobryVecer" {:pwd "testujem"
                           :title "Tester"
-                          :color "yellow"}})
+                          :color "yellow"}
+            "Domácí nudle" {:pwd "ŽabákFerda"
+                            :title "Admin"
+                            :color "red"}
+            "yt/Filip" {:pwd "bry*F"
+                        :title "Admin"
+                        :color "orange"}
+            "MATYWOSN" {:pwd "MATYWOSN"
+                        :title "Admin"
+                        :color "red"}})
 
 (re-frame/reg-event-db
  ::login
@@ -81,7 +83,7 @@
  (fn [{:keys [db]} [_ state]]
    (cond-> {:db (assoc db :ws-error? state)}
      (and (true? state) (not= (:ws-error? db) state))
-     (assoc :ws-call {:type :get-init-info}))))
+     (assoc :ws-call {:type :ws-client/get-init-info}))))
 
 (re-frame/reg-event-fx
  ::ws-received

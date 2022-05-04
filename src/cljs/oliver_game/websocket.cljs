@@ -1,6 +1,5 @@
 (ns oliver-game.websocket
-  (:require [cljs.reader :as reader]
-            [cognitect.transit :as t]
+  (:require [cognitect.transit :as t]
             [re-frame.core :as re-frame]
             [re-frame.db :refer [app-db]]))
 
@@ -11,7 +10,7 @@
 
 (defn ws-receive [msg]
   (let [msg (.-data msg)
-        data (t/read t-reader msg) ;; edn: (reader/read-string msg)
+        data (t/read t-reader msg) ;; edn: [cljs.reader :as reader] (reader/read-string msg)
         data (if (map? data) [data] data)]
     #_(println "Browser received WS data '" msg "'")
     (doseq [msg data]

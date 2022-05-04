@@ -1,35 +1,31 @@
 (defproject oliver-game "0.0.4-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.10.1"]
-                 [org.clojure/clojurescript "1.10.597"]
-                 ;;[org.clojure/core.async "1.1.587"]
-                 [org.clojure/tools.logging "1.1.0"]
-                 [com.cognitect/transit-clj "1.0.324"]
-                 [com.cognitect/transit-cljs "0.8.264"]
-                 [re-frame "0.10.6"]
-                 [reagent "0.8.1"]
-                 [com.andrewmcveigh/cljs-time "0.5.2"]
-                 [ring "1.7.1" ;; :exclusions [ring/ring-jetty-adapter]
-                  ]
-                 [ring/ring-defaults "0.3.2"]
-                 [aleph "0.4.7-alpha5"]
-                 [clj-commons/secretary "1.2.4"]
-                 [compojure "1.6.1"]
+  :dependencies [[org.clojure/clojure "1.11.1"]
+                 [org.clojure/clojurescript  "1.11.4"]
+                 [org.clojure/tools.logging "1.2.4"]
+                 [ch.qos.logback/logback-classic "1.2.11"]
+                 [com.cognitect/transit-clj "1.0.329"]
+                 [com.cognitect/transit-cljs "0.8.269"]
                  [environ "1.2.0"]
-                 [re-pressed "0.3.1"]
-                 [nrepl "0.7.0"]]
+                 [integrant "0.8.0"]
+                 [luminus/ring-undertow-adapter "1.2.5"]
+                 [ring/ring-core "1.9.5"]
+                 [ring/ring-defaults "0.3.3"]
+                 [metosin/reitit-ring "0.5.17"]
+                 [hiccup "1.0.5"]
+                 [re-frame "1.2.0"]
+                 [nrepl "0.9.0"]]
 
-  :plugins [[lein-cljsbuild "1.1.7"]
-            [lein-javac-resources "0.1.1"]]
+  :plugins [[lein-cljsbuild "1.1.8"]]
 
   :main ^:skip-aot oliver-game.main
 
   :min-lein-version "2.5.3"
 
-  :jvm-opts ["-Duser.timezone=UTC" "-XX:-OmitStackTraceInFastThrow"]
+  :jvm-opts ["-Duser.timezone=UTC" "-XX:-OmitStackTraceInFastThrow" "-Dclojure.tools.logging.factory=clojure.tools.logging.impl/slf4j-factory"]
+
+  :javac-options ["-target" "1.8" "-source" "1.8"]
 
   :source-paths ["src/clj" "src/cljc" "src/cljs"]
-
-  :hooks [leiningen.javac-resources]
 
   :clean-targets ^{:protect false} ["resources/public/cljs-out" "target"]
 
@@ -37,11 +33,14 @@
   {:dev
    {:source-paths ["dev"]
     :repl-options {:init-ns user}
-    :dependencies [[binaryage/devtools "1.0.0"]
-                   [com.bhauman/figwheel-main "0.2.4"]]
-
+    :dependencies [[binaryage/devtools "1.0.5"]
+                   [com.bhauman/figwheel-main "0.2.16"]
+                   [com.bhauman/rebel-readline-cljs "0.1.4"]
+                   [cider/piggieback "0.5.3"]
+                   [hashp "0.2.1"]
+                   [integrant/repl "0.3.2"]]
     :resource-paths ["target"]
-    }
+    :plugins [[lein-environ "1.2.0"]]}
 
    :uberjar {:omit-source  true
              :main         oliver-game.main

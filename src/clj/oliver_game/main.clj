@@ -1,13 +1,17 @@
 (ns oliver-game.main
   (:require [clojure.tools.logging :as log]
-            [oliver-game.server :as server])
+            [oliver-game.system :refer [config]]
+            [integrant.core :as ig])
   (:gen-class))
 
-(defn -main [& args]
-  (server/start-all)
-  (.addShutdownHook (Runtime/getRuntime) (Thread. #'server/stop-all)))
+(def system (atom nil))
+
+(defn -main []
+  (reset! system (ig/init config))
+  (let [^Runnable stop-fn #(ig/halt! @system)]
+    (.addShutdownHook (Runtime/getRuntime) (Thread. stop-fn))))
 
 (Thread/setDefaultUncaughtExceptionHandler
- (reify Thread$UncaughtExceptionHandler
-   (uncaughtException [_ thread ex]
-     (log/error "Uncaught exception in thread" (.getName thread) ":" ex))))
+  (reify Thread$UncaughtExceptionHandler
+    (uncaughtException [_ thread ex]
+      (log/error "Uncaught exception in thread" (.getName thread) ":" ex))))

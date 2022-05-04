@@ -57,6 +57,9 @@
      :compiler     {:main oliver-game.core
                     :output-to       "resources/public/cljs-out/app-main.js"
                     :optimizations   :advanced
+                    :language-in     :ecmascript-next
+                    :language-out    :ecmascript-next
+                    :parallel-build true
                     :closure-defines {goog.DEBUG false}
                     :pretty-print    false}}]}
 

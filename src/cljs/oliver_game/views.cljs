@@ -7,11 +7,10 @@
    [reagent.core :as reagent]
    [re-frame.core :as re-frame]))
 
-(defn hexagon [& {:keys [x y s] :or {s 2.3}}]
+(defn hexagon [& {:keys [x y s color] :or {s 2.3 color "gray"}}]
   [:g {:transform (str "translate(" x "," y "), scale(" s " " s ")")}
    #_[:circle {:cx 50 :cy 50 :r 10 :fill "red"}]
-   #_[:polygon {:points "0,0 50,0 50,50 0,50" :fill "none" :stroke "gray"}]
-   [:polygon {:points "50,0 100,25 100,75 50,100 0,75 0,25" :fill "none" :stroke "gray"}]]
+   [:polygon {:points "50,0 100,25 100,75 50,100 0,75 0,25" :fill "none" :stroke color :stroke-width 2}]]
   )
 
 (defn sea-travel [sea-travel?]
@@ -20,7 +19,7 @@
    (let [x0 20
          y0 20
          dx 320
-         dy 270
+         dy 245
          x02 155]
      [:svg {:width 1000 :viewBox "0 0 1535 1104"}
       #_[:image {:x 0 :y 0 :xlink-href "/img/mapa-hry.png" :width 1509 :height 1104}]
@@ -31,6 +30,10 @@
       (doall
         (for [x (->> (range 5) (map (partial * dx)))]
           [hexagon :x (+ x x0 0) :y (+ y0 dy)]))
+
+      (doall
+        (for [x (->> (range 5) (map (partial * dx)))]
+          [hexagon :x (+ x -30 0) :y (+ y0 -40 dy) :color "blue" :s 3.2]))
 
       (doall
         (for [x (->> (range 4) (map (partial * dx)))]
@@ -85,8 +88,7 @@
    " " u])
 
 (defn panel []
-  (let [show-milk-shakes? (re-frame/subscribe [::subs/show? :show-milk-shakes?])
-        celkem (reagent/atom 0)
+  (let [celkem (reagent/atom 0)
         ;;pokladna (reagent/atom (int (rand 84)))
         burger-idx (reagent/atom (int (rand 3)))
         show-game? (reagent/atom false)

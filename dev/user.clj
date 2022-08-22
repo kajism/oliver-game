@@ -1,48 +1,68 @@
 (ns user
-  (:require [clojure.tools.namespace.repl]
-            [figwheel.main]
-            [figwheel.main.api]
+  (:require [cljc.portal :as portal]
+            [clojure.java.io :as io]
+            [clojure.repl]
+            [clojure.tools.namespace.repl]
+            [oliver-game.system :as system]
             [integrant.repl :as ig-repl :refer [halt]]
             [integrant.repl.state :as ig-state]
-            [oliver-game.system :as system]))
+            [shadow.cljs.devtools.api :as shadow]
+            [shadow.cljs.devtools.server :as shadow-server]))
 
-(clojure.tools.namespace.repl/set-refresh-dirs "src/clj" "src/cljc" "test/clj" "test/cljc")
+(clojure.tools.namespace.repl/set-refresh-dirs "src" "test")
 
 (ig-repl/set-prep! (fn [] system/config))
 
-(defonce figwheel-started? (atom false))
+(defonce cljs-started? (atom false))
+
+(defn reset-cljs-build []
+  (shadow-server/stop!)
+  (shadow-server/start!)
+  (shadow/watch :app {:autobuild false})
+  (reset! cljs-started? true))
 
 (defn reset []
   (ig-repl/reset)
-  (when-not @figwheel-started?
-    (figwheel.main.api/start {:mode :serve} "app")
-    (reset! figwheel-started? true)))
+  (when-not @cljs-started?
+    (reset-cljs-build))
+  (shadow/watch-compile! :app))
+
+(def open-portal portal/open)
+
+(def close-portal portal/close)
+
+(def pportal portal/pp)
+
+(def >portal portal/>p)
+
+(def >>portal portal/>>p)
 
 (comment
-  (figwheel.main.api/start {:mode :serve} "app")
-  (figwheel.main.api/cljs-repl "app")
-  (figwheel.main.api/stop "app")
-  (figwheel.main/status)
-  (figwheel.main/clean "app")
+  (open-portal)
+  (portal.api/clear)
+  (pportal "my data" {:my "data" :a 1})
+  ;;see more examples in dev/cljc.portal
+  (deref (deref portal/portal-client-ref))
+  (close-portal)
+
+  (shadow-server/reload!)
+  (shadow/active-builds)
+  (shadow/repl :app)
+  (shadow/compile :app)
+  (shadow/watch :app)
+  (shadow/watch :app {:autobuild false})
+  (shadow/watch-compile! :app)
+  (shadow/watch-compile-all!)
 
   (reset)
   (halt)
 
-  (require '[reitit.core :as r])
-  (require '[reitit.ring :as rring])
-  (-> (:app/handler ig-state/system) (rring/get-router) (r/compiled-routes))
-
   (remove-ns 'user)
 
-  (clojure.tools.namespace.repl/refresh-all)
   (clojure.tools.namespace.repl/clear)
+  (clojure.tools.namespace.repl/refresh-all)
+
   )
 
-(defn ctx []
-  (:app/ctx ig-state/system))
-
-(defn db []
-  (:sql/db ig-state/system))
-
-(defn event-queue []
-  (:app/event-queue ig-state/system))
+(when (io/resource "local.clj")
+  (load "local"))

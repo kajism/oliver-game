@@ -7,6 +7,39 @@
    [reagent.core :as reagent]
    [re-frame.core :as re-frame]))
 
+(defn hexagon [& {:keys [x y s] :or {s 2.3}}]
+  [:g {:transform (str "translate(" x "," y "), scale(" s " " s ")")}
+   #_[:circle {:cx 50 :cy 50 :r 10 :fill "red"}]
+   #_[:polygon {:points "0,0 50,0 50,50 0,50" :fill "none" :stroke "gray"}]
+   [:polygon {:points "50,0 100,25 100,75 50,100 0,75 0,25" :fill "none" :stroke "gray"}]]
+  )
+
+(defn sea-travel [sea-travel?]
+  [:div
+   [:h2 "Sea travel"]
+   (let [x0 20
+         y0 20
+         dx 320
+         dy 270
+         x02 155]
+     [:svg {:width 1000 :viewBox "0 0 1535 1104"}
+      #_[:image {:x 0 :y 0 :xlink-href "/img/mapa-hry.png" :width 1509 :height 1104}]
+      (doall
+        (for [x (->> (range 4) (map (partial * dx)))]
+          [hexagon :x (+ x x0 x02) :y (+ y0)]))
+
+      (doall
+        (for [x (->> (range 5) (map (partial * dx)))]
+          [hexagon :x (+ x x0 0) :y (+ y0 dy)]))
+
+      (doall
+        (for [x (->> (range 4) (map (partial * dx)))]
+          [hexagon :x (+ x x0 x02) :y (+ y0 (* dy 2))]))
+      #_[hexagon :x 20 :y 20]
+
+      ])
+   [:button {:on-click #(reset! sea-travel? false)} "Zpět na Homepage"]])
+
 (def burgery [{:img "classic-burger.png"
                :cena 20}
               {:img "kecup-burger.png"
@@ -58,12 +91,15 @@
         burger-idx (reagent/atom (int (rand 3)))
         show-game? (reagent/atom false)
         mini-adventures? (reagent/atom false)
+        sea-travel? (reagent/atom true)
         chat-input (reagent/atom "")
         user (re-frame/subscribe [::subs/get-in :user])]
     (fn []
       [:div
        [:h1 "Oliver's Game Page"]
        (cond
+         @sea-travel?
+         [sea-travel sea-travel?]
          @mini-adventures?
          [mini-adventures]
          @show-game?
@@ -174,7 +210,9 @@
                                     (reset! chat-input ""))} "Odeslat"]])
           [:br]
           [:br]
-          [:button {:on-click #(reset! show-game? true)} "Hrát hru"][:br][:br]
-          [:button {:on-click #(reset! mini-adventures? true)} "Hrát hru Mini adventures!"]]
+          [:button {:on-click #(reset! sea-travel? true)} "Hrát hru Sea travel!"]
+          ;;[:button {:on-click #(reset! show-game? true)} "Hrát hru"][:br][:br]
+          ;;[:button {:on-click #(reset! mini-adventures? true)} "Hrát hru Mini adventures!"]
+          ]
 
          )])))

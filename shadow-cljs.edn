@@ -1,0 +1,13 @@
+{:deps {:aliases [:cljs]}
+ :builds
+ {:app {:target :browser
+        :output-dir "resources/public/cljs/"
+        :asset-path "/cljs"
+        :module-loader true
+        :modules {:cljs_base {:entries [oliver-game.core]
+                              :init-fn oliver-game.core/init}}
+        :devtools {:watch-dir "resources/public"
+                   :after-load oliver-game.core/mount-root
+                   :preloads [hashp.core]
+                   :repl-init-ns cljs.user
+                   :repl-pprint true}}}}

@@ -3,9 +3,10 @@
 /log
 /config
 /*-init.clj
-/resources/public/cljs-out/
+/resources/public/cljs/
 out
 /.*
 !.gitignore
 db.txt
 *.iml
+node_modules/

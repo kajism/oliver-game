@@ -31,7 +31,7 @@
       (resp/header "ETag" (str "Version-" (:version (app-version-info))))))
 
 (defn js [_]
-  (-> (resp/resource-response "app-main.js" {:root "public/cljs-out"})
+  (-> (resp/resource-response "cljs_base.js" {:root "public/cljs"})
       (resp/content-type "application/javascript")
       (resp/header "ETag" (str "Version-" (:version (app-version-info))))))
 

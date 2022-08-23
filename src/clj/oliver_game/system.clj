@@ -10,7 +10,7 @@
   (:import (io.undertow Undertow)))
 
 (def config
-  {:nrepl/server {:port (parse-long (or (env :nrepl-port) "7044"))}
+  {:nrepl/server {:port (parse-long (or (env :nrepl-port) "7022"))}
    :app/event-queue {:capacity 100}
    :app/ctx {}
    :app/server {:event-queue (ig/ref :app/event-queue)
@@ -19,7 +19,7 @@
                  :app/server (ig/ref :app/server) ;; everything should be started before handling requests
                  }
    :http/server {:handler (ig/ref :app/handler)
-                 :port (parse-long (or (env :port) "3002"))}})
+                 :port (parse-long (or (env :port) "3022"))}})
 
 (defmethod ig/init-key :nrepl/server [_ {:keys [port]}]
   (nrepl.server/start-server :port port))

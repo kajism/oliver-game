@@ -2,7 +2,7 @@
   (:require [clojure.tools.build.api :as b]
             [remove-hashp :refer [remove-hashp]]))
 
-(def lib 'didagraph/didagraph)
+(def lib 'oliver-game/oliver-game)
 (def version (format "1.0.%s" (b/git-count-revs nil)))
 (def class-dir "target/classes")
 (def deps-edn "deps.edn")
@@ -14,7 +14,7 @@
 
 (defn clean []
       (b/delete {:path "target"})
-      (b/delete {:path "resources/didagraph/public/cljs/"}))
+      (b/delete {:path "resources/public/cljs/"}))
 
 (defn cljs-release []
       (b/process {:command-args ["npm" "install"]})
@@ -60,6 +60,6 @@
       (b/uber {:class-dir class-dir
                :uber-file uber-file
                :basis basis
-               :main 'didagraph.main})
+               :main 'oliver-game.main})
 
       (println "Uberjar:" uber-file))

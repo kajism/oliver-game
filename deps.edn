@@ -8,8 +8,8 @@
 ;;       or clj -M:nREPL-client --port 7007
 ;; Run from sources, without uberjar build:
 ;;       shadow-cljs release app
-;;       clojure -M -m masyst.main
-;; Run jar build (no uberjar), just masyst.jar (20MB), lib/datomic-*.jar, deps.edn:
+;;       clojure -M -m oliver-game.main
+;; Run jar build (no uberjar), just oliver-game.jar (20MB), lib/datomic-*.jar, deps.edn:
 ;;      clojure -M:run-jar
 ;;      DATOMIC_URI=datomic:free://localhost:2334/ APP_DOMAINS=localhost APP_DBS=kajism clojure -M:run-jar
 ;; Run all tests: clj -X:test
@@ -64,8 +64,8 @@
                              "--connect"
                              "--host" "127.0.0.1"
                              "--port" "7000"]}
-  :run-jar {:extra-deps {masyst/masyst {:local/root "masyst.jar"}}
-            :main-opts ["-m" "masyst.main"]
+  :run-jar {:extra-deps {oliver-game/oliver-game {:local/root "oliver-game.jar"}}
+            :main-opts ["-m" "oliver-game.main"]
             :jvm-opts ["-server" "-XX:-OmitStackTraceInFastThrow" "-Djdk.tls.client.protocols=TLSv1.2"
                        "-Duser.timezone=UTC" "-Dfile.encoding=UTF-8" "-Dsun.jnu.encoding=UTF-8"]}
   :test {:extra-paths ["test"]

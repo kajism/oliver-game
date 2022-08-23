@@ -1,16 +1,30 @@
 (ns oliver-game.views
   (:require
    [clojure.string :as str]
-   [oliver-game.common :as common :refer [etv]]
+   [oliver-game.common :refer [etv]]
    [oliver-game.events :as events]
    [oliver-game.subs :as subs]
    [reagent.core :as reagent]
    [re-frame.core :as re-frame]))
 
-(defn hexagon [& {:keys [x y s color] :or {s 2.3 color "gray"}}]
-  [:g {:transform (str "translate(" x "," y "), scale(" s " " s ")")}
-   #_[:circle {:cx 50 :cy 50 :r 10 :fill "red"}]
-   [:polygon {:points "50,0 100,25 100,75 50,100 0,75 0,25" :fill "none" :stroke color :stroke-width 2}]]
+(defn hexagon [& {:keys [x y s color from-idx to-idx pattern] :or {s 2.3 color "gray" from-idx 0 to-idx 7 pattern "coconut"}}]
+  (let [polygon? (= 7 (- to-idx from-idx))
+        river? (= color "blue")
+        points (-> (str/split "50,0 100,25 100,75 50,100 0,75 0,25 50,0" #"\s")
+                   (vec)
+                   (subvec from-idx to-idx))]
+    [:g {:transform (str "translate(" x "," y "), scale(" s " " s ")")}
+     [(if polygon? :polygon :polyline)
+      (cond->
+        {:points (str/join " " points) :fill "none" :stroke color :stroke-width s :stroke-linecap "round"}
+        (and pattern (not river?))
+        (assoc :fill (str "url(#" pattern ")")))]
+     (when river?
+       (doall
+         (for [p (set points)
+               :let [[x y] (str/split p #",")]]
+           ^{:key [x y]}
+           [:circle {:cx x :cy y :r 10 :stroke "gray" :fill "none"}])))])
   )
 
 (defn sea-travel [sea-travel?]
@@ -20,25 +34,49 @@
          y0 20
          dx 320
          dy 245
-         x02 155]
+         x02 155
+         s 3.2]
      [:svg {:width 1000 :viewBox "0 0 1535 1104"}
+      [:defs
+       [:pattern {:id "coconut" :height "100%" :width "100%" :patern-content-units "objectBoundingBox"}
+        [:image {:height "92" :width "68" :preserve-aspect-ratio "none" :xlink-href "/img/file-burger.png"}]]]
       #_[:image {:x 0 :y 0 :xlink-href "/img/mapa-hry.png" :width 1509 :height 1104}]
       (doall
         (for [x (->> (range 4) (map (partial * dx)))]
+          ^{:key x}
           [hexagon :x (+ x x0 x02) :y (+ y0)]))
 
       (doall
         (for [x (->> (range 5) (map (partial * dx)))]
+          ^{:key x}
           [hexagon :x (+ x x0 0) :y (+ y0 dy)]))
 
       (doall
-        (for [x (->> (range 5) (map (partial * dx)))]
-          [hexagon :x (+ x -30 0) :y (+ y0 -40 dy) :color "blue" :s 3.2]))
-
-      (doall
         (for [x (->> (range 4) (map (partial * dx)))]
+          ^{:key x}
           [hexagon :x (+ x x0 x02) :y (+ y0 (* dy 2))]))
-      #_[hexagon :x 20 :y 20]
+
+      ;;river
+      (doall
+        (for [x (->> (range 3) (map (partial * dx)))]
+          ^{:key x}
+          [hexagon :x (+ x x0 x02 -45) :y -15 :color "blue" :s s :from-idx 1 :to-idx 3]))
+      (doall
+        (for [x (->> (range 3) (map (partial * dx)))]
+          ^{:key x}
+          [hexagon :x (+ x dx -30 0) :y (+ y0 -40 dy) :color "blue" :s s]))
+      [hexagon :x -30 :y (+ y0 -40 dy) :color "blue" :s s :from-idx 0 :to-idx 4]
+      [hexagon :x (+ -30 (* 4 dx)) :y (+ y0 -40 dy) :color "blue" :s s :from-idx 3 :to-idx 7]
+      (doall
+        (for [x (->> (range 3) (map (partial * dx)))]
+          ^{:key x}
+          [hexagon :x (+ x x0 x02 -45) :y 465 :color "blue" :s s :from-idx 1 :to-idx 3]))
+
+      [:circle {:cx 450 :cy 65 :r 35 :stroke "none" :fill "purple"}]
+      [:circle {:cx 1090 :cy 65 :r 35 :stroke "none" :fill "orange"}]
+      [:circle {:cx 1090 :cy 705 :r 35 :stroke "none" :fill "red"}]
+      [:circle {:cx 130 :cy 545 :r 35 :stroke "none" :fill "yellow"}]
+      #_[:line {:x1 150 :y1 230 :x2 290 :y2 305 :stroke "blue" :stroke-width (* s s)}]
 
       ])
    [:button {:on-click #(reset! sea-travel? false)} "Zpět na Homepage"]])
